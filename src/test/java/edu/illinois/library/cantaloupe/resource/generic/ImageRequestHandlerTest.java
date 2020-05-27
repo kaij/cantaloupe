@@ -35,27 +35,81 @@ public class ImageRequestHandlerTest extends BaseTest {
         }
 
         @Test
-        void testBuildWithDelegateProxyButNoRequestContextSet() throws Exception {
+        void testOptionallyWithDelegateProxyWithNonNullArguments() throws Exception {
             var config = Configuration.getInstance();
             config.setProperty(Key.DELEGATE_SCRIPT_ENABLED, true);
 
             RequestContext context = new RequestContext();
             DelegateProxy delegateProxy =
                     DelegateProxyService.getInstance().newDelegateProxy(context);
-            assertThrows(NullPointerException.class, () ->
-                    ImageRequestHandler.builder()
-                            .withOperationList(new OperationList())
-                            .withDelegateProxy(delegateProxy)
-                            .build());
+
+            ImageRequestHandler handler = ImageRequestHandler.builder()
+                    .optionallyWithDelegateProxy(delegateProxy, context)
+                    .withOperationList(new OperationList())
+                    .build();
+            assertNotNull(handler.delegateProxy);
+            assertNotNull(handler.requestContext);
         }
 
         @Test
-        void testBuildWithRequestContextButNoDelegateProxySet() {
-            assertThrows(NullPointerException.class, () ->
+        void testOptionallyWithDelegateProxyWithNullDelegateProxy() {
+            RequestContext context = new RequestContext();
+            ImageRequestHandler handler = ImageRequestHandler.builder()
+                    .optionallyWithDelegateProxy(null, context)
+                    .withOperationList(new OperationList())
+                    .build();
+            assertNull(handler.delegateProxy);
+            // build() sets this, otherwise would be null
+            assertNotNull(handler.requestContext);
+        }
+
+        @Test
+        void testOptionallyWithDelegateProxyWithNullRequestContext() throws Exception {
+            var config = Configuration.getInstance();
+            config.setProperty(Key.DELEGATE_SCRIPT_ENABLED, true);
+
+            RequestContext context = new RequestContext();
+            DelegateProxy delegateProxy =
+                    DelegateProxyService.getInstance().newDelegateProxy(context);
+
+            ImageRequestHandler handler = ImageRequestHandler.builder()
+                    .withOperationList(new OperationList())
+                    .optionallyWithDelegateProxy(delegateProxy, null)
+                    .build();
+            assertNull(handler.delegateProxy);
+            // build() sets this, otherwise would be null
+            assertNotNull(handler.requestContext);
+        }
+
+        @Test
+        void testOptionallyWithDelegateProxyWithNullArguments() {
+            ImageRequestHandler handler = ImageRequestHandler.builder()
+                    .withOperationList(new OperationList())
+                    .optionallyWithDelegateProxy(null, null)
+                    .build();
+            assertNull(handler.delegateProxy);
+            // build() sets this, otherwise would be null
+            assertNotNull(handler.requestContext);
+        }
+
+        @Test
+        void testWithDelegateProxyWithNullDelegateProxy() {
+            assertThrows(IllegalArgumentException.class, () ->
                     ImageRequestHandler.builder()
-                            .withOperationList(new OperationList())
-                            .withRequestContext(new RequestContext())
-                            .build());
+                            .withDelegateProxy(null, new RequestContext()));
+        }
+
+        @Test
+        void testWithDelegateProxyWithNullRequestContext() throws Exception {
+            var config = Configuration.getInstance();
+            config.setProperty(Key.DELEGATE_SCRIPT_ENABLED, true);
+
+            RequestContext context = new RequestContext();
+            DelegateProxy delegateProxy =
+                    DelegateProxyService.getInstance().newDelegateProxy(context);
+            assertThrows(IllegalArgumentException.class, () ->
+                    ImageRequestHandler.builder()
+                            .withDelegateProxy(delegateProxy, null));
         }
 
     }

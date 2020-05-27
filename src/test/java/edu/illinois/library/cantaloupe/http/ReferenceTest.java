@@ -41,6 +41,12 @@ public class ReferenceTest extends BaseTest {
     }
 
     @Test
+    void testCopyConstructorClonesQuery() {
+        Reference copy = new Reference(instance);
+        assertNotSame(instance.getQuery(), copy.getQuery());
+    }
+
+    @Test
     void testStringConstructor() {
         String uri = "http://example.org/cats/dogs?cats=dogs";
         Reference ref = new Reference(uri);
@@ -346,7 +352,8 @@ public class ReferenceTest extends BaseTest {
 
     @Test
     void testSetQueryWithNullArgument() {
-        assertThrows(NullPointerException.class, () -> instance.setQuery(null));
+        assertThrows(IllegalArgumentException.class,
+                () -> instance.setQuery(null));
     }
 
     @Test
