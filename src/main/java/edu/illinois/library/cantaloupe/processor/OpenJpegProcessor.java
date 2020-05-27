@@ -620,7 +620,7 @@ class OpenJpegProcessor extends AbstractProcessor implements FileProcessor {
         command.add(getPath());
 
         if (isQuietModeSupported()) {
-            command.add("-quiet");
+            //command.add("-quiet");
         }
 
         command.add("-i");
