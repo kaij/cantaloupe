@@ -24,3 +24,4 @@ nbactions.xml
 
 # Auto-generated content
 /target
+.vscode
